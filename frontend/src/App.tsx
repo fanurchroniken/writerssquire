@@ -7,6 +7,8 @@ import { AuthCallback } from './pages/AuthCallback';
 import Home from './pages/Home';
 import WorldDetail from './pages/WorldDetail';
 import WorldAtlas from './pages/WorldAtlas';
+import DocumentEditor from './pages/DocumentEditor';
+import WorldWriting from './pages/WorldWriting';
 
 function App() {
   return (
@@ -21,6 +23,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/documents/:documentId"
+            element={
+              <ProtectedRoute>
+                <DocumentEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/worlds/:worldId/writing"
+            element={
+              <ProtectedRoute>
+                <WorldWriting />
               </ProtectedRoute>
             }
           />

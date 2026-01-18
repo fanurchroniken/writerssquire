@@ -29,16 +29,17 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
       return res.status(401).json({ success: false, error: { message: 'Not authenticated' } });
     }
 
-    const { world_id, type, status } = req.query;
+    const { world_id, type, status, parent_document_id } = req.query;
 
     let query = supabase
       .from('documents')
-      .select('id, title, type, status, language, word_count, world_id, created_at, updated_at')
+      .select('id, title, type, status, language, word_count, world_id, parent_document_id, "order", created_at, updated_at')
       .eq('owner_id', user.id);
 
     if (world_id) query = query.eq('world_id', world_id);
     if (type) query = query.eq('type', type);
     if (status) query = query.eq('status', status);
+    if (parent_document_id) query = query.eq('parent_document_id', parent_document_id);
 
     const { data: documents, error } = await query.order('updated_at', { ascending: false });
 
@@ -94,7 +95,15 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
       return res.status(401).json({ success: false, error: { message: 'Not authenticated' } });
     }
 
-    const { title, type = 'manuscript', language = 'en', world_id, content = '' } = req.body;
+    const {
+      title,
+      type = 'manuscript',
+      language = 'en',
+      world_id,
+      parent_document_id,
+      order,
+      content = '',
+    } = req.body;
 
     if (!title || title.trim().length === 0) {
       return res.status(400).json({ success: false, error: { message: 'Title is required' } });
@@ -102,6 +111,10 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
 
     if (title.length > 200) {
       return res.status(400).json({ success: false, error: { message: 'Title must be 200 characters or less' } });
+    }
+
+    if (order !== undefined && (typeof order !== 'number' || !Number.isFinite(order) || Math.floor(order) !== order)) {
+      return res.status(400).json({ success: false, error: { message: 'Order must be an integer' } });
     }
 
     // Calculate word count from content
@@ -116,6 +129,8 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
         type,
         language,
         world_id: world_id || null,
+        parent_document_id: parent_document_id || null,
+        order: order ?? 0,
         content,
         plain_text: plainText,
         word_count: wordCount,
@@ -144,7 +159,7 @@ router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
       return res.status(401).json({ success: false, error: { message: 'Not authenticated' } });
     }
 
-    const { title, content, type, language, status, world_id } = req.body;
+    const { title, content, type, language, status, world_id, parent_document_id, order } = req.body;
 
     const updateData: Record<string, any> = {};
     if (title !== undefined) updateData.title = title.trim();
@@ -152,6 +167,8 @@ router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
     if (language !== undefined) updateData.language = language;
     if (status !== undefined) updateData.status = status;
     if (world_id !== undefined) updateData.world_id = world_id;
+    if (parent_document_id !== undefined) updateData.parent_document_id = parent_document_id;
+    if (order !== undefined) updateData.order = order;
     
     if (content !== undefined) {
       updateData.content = content;
