@@ -15,7 +15,7 @@ WriterSquire combines rich worldbuilding tools with professional writing capabil
 ```
 writerssquire/
 ├── frontend/          # React 18 + Vite + TypeScript
-├── backend/           # Express.js + TypeScript + MongoDB
+├── backend/           # Express.js + TypeScript + PostgreSQL
 ├── Project Requirement Documentation/  # Project documentation
 └── README.md
 ```
@@ -108,6 +108,29 @@ writerssquire/
    - Backend API: http://localhost:3001
    - Prisma Studio: `cd backend && npx prisma studio` (opens http://localhost:5555)
 
+## 🐳 Docker Deployment
+
+WriterSquire is fully containerized and ready for deployment using Docker and Docker Compose. See [DOCKER_DEPLOYMENT.md](./DOCKER_DEPLOYMENT.md) for complete deployment instructions.
+
+### Quick Start with Docker
+
+```bash
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your values
+
+# Start with Docker Compose
+docker compose up -d
+```
+
+The application will be available at:
+- Frontend: http://localhost
+- Backend API: http://localhost:3001
+
+### GitHub Container Registry
+
+Docker images are automatically built and pushed to GitHub Container Registry on every push to `main`. See the [GitHub Actions workflow](./.github/workflows/docker-build-push.yml) for details.
+
 ## 📚 Documentation
 
 Comprehensive project documentation is available in the `Project Requirement Documentation/` folder:
@@ -126,6 +149,7 @@ Comprehensive project documentation is available in the `Project Requirement Doc
 - [Complete MVP Setup](./MVP_SETUP_COMPLETE.md) - Detailed setup instructions
 - [Supabase Setup Guide](./SUPABASE_SETUP.md) - Complete Supabase Auth setup
 - [PostgreSQL Migration](./POSTGRESQL_MIGRATION.md) - Database setup guide
+- [Docker Deployment](./DOCKER_DEPLOYMENT.md) - Container deployment guide
 
 ## 🛠️ Tech Stack
 
@@ -170,8 +194,8 @@ WriterSquire follows a modern web application architecture:
 
 ```
 Frontend (React) → REST API → Backend (Express) → PostgreSQL (Prisma)
-                                                      ↓
-                                              Supabase Auth
+                                                     ↓
+                                             Supabase Auth
 ```
 
 ### Core Modules
